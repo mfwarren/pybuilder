@@ -1,12 +1,22 @@
-from base
-ENV http_proxy http://10.1.0.11:8080/
-ENV https_proxy https://10.1.0.11:8080/
-run	echo 'deb http://archive.ubuntu.com/ubuntu quantal main universe multiverse' > /etc/apt/sources.list
-run	apt-get update
-run	DEBIAN_FRONTEND=noninteractive apt-get install -y -q git curl golang s3cmd
-ADD	git-wrapper	/usr/local/bin/git
-ADD	s3cfg	/.s3cfg
-run	DEBIAN_FRONTEND=noninteractive apt-get install -y -q python-all
-run	DEBIAN_FRONTEND=noninteractive apt-get install -y -q python-pip
-ADD	buildapp /usr/local/bin/buildapp
-ADD	runapp /usr/local/bin/runapp
+FROM ubuntu
+
+RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
+RUN apt-get update
+RUN apt-get upgrade -y
+
+RUN apt-get install -y language-pack-en
+ENV LANGUAGE en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+
+RUN locale-gen en_US.UTF-8
+RUN dpkg-reconfigure locales
+
+RUN apt-get install -y openssh-server git-core libxml2-dev curl python build-essential make gcc python-dev wget libsqlite3-dev sqlite3
+RUN apt-get install -y postgresql-client-9.1 postgresql-client-common libpq5
+RUN apt-get install -y libpq-dev
+RUN apt-get install -y libevent-dev libmemcached-dev python-pip
+
+ADD git-wrapper /usr/local/bin/git
+ADD buildapp /usr/local/bin/buildapp
+ADD runapp /usr/local/bin/runapp
